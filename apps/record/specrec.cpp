@@ -59,7 +59,7 @@ typedef struct circbuff_element{
 
 namespace po = boost::program_options;
 boost::atomic<bool> done(false);
-uhd::atomic_uint32_t num_elements;
+std::atomic<std:uint32_t> num_elements;
 //static bool stop_signal_called = false;
 //void sig_int_handler(int){stop_signal_called = true;}
 void sig_int_handler(int){ done = true; }
@@ -83,7 +83,7 @@ void usrp_write_samples_to_file(int fd,
 				printf("Wrote %d/%d bytes\n",bytes_written,CB_ELEMENT_SIZE);
 			}
 		}
-		num_elements.dec();
+		num_elements--;
 	}
 }
 
@@ -342,7 +342,7 @@ template<typename samp_type> void recv_to_file(
 			continue;
 		}else{
 		  circbuff_notfull = buff.push_with_haste(read_ele);
-		  num_elements.inc();
+		  num_elements++;
                   if( start_stream == false ){
                      start_stream = true;
 		     pc_start_time = now;
@@ -414,7 +414,7 @@ template<typename samp_type> void recv_to_file(
 				double t = (double)update_diff.ticks() / 
 					(double)boost::posix_time::time_duration::ticks_per_second();
 				double r = (double)last_update_samps / t;
-				boost::uint32_t cur_cb_size= num_elements.read();
+				boost::uint32_t cur_cb_size = num_elements;
 				printf("%f Msps | %d / %zu elements\n",r/1e6,cur_cb_size,cbcapacity);
 				last_update_samps = 0;
 				last_update = now;
